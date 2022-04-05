@@ -11,6 +11,10 @@ const compact = (movies = []) => {
   );
 }
 
+const financial = (x) => {
+  return Number.parseFloat(x).toFixed(2);
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -82,7 +86,7 @@ class App extends Component {
         })),
         loaded: true
       },
-      cost: rentals.reduce((acc, item) => acc += Number(item?.price ?? 0), 0)
+      cost: financial(rentals.reduce((acc, item) => acc += Number(item?.price ?? 0), 0))
     });
     console.log(rentals);
   }
