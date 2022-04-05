@@ -88,7 +88,6 @@ class App extends Component {
       },
       cost: financial(rentals.reduce((acc, item) => acc += Number(item?.price ?? 0), 0))
     });
-    console.log(rentals);
   }
 
   onScroll = () => {
