@@ -24,6 +24,7 @@ class App extends Component {
         data: [],
         loaded: false
       },
+      cost: 0,
       session: {
         name: 'Cindy',
         lastName: 'Lopez',
@@ -80,8 +81,10 @@ class App extends Component {
           rented: !!rentals.find(c => c.id === movie.id)
         })),
         loaded: true
-      }
+      },
+      cost: rentals.reduce((acc, item) => acc += Number(item?.price ?? 0), 0)
     });
+    console.log(rentals);
   }
 
   onScroll = () => {
@@ -91,7 +94,7 @@ class App extends Component {
   }
 
   render() {
-    const { catalog, rental, session } = this.state;
+    const { catalog, rental, session, cost } = this.state;
     return (
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
@@ -114,6 +117,7 @@ class App extends Component {
         />
         <TitleList
           title={`${session.name}'s movies`}
+          cost={cost}
           titles={rental.data}
           loaded={rental.loaded}
         />
@@ -203,10 +207,19 @@ class HeroButton extends Component {
 
 class TitleList extends Component {
   renderList() {
-    const { titles, loaded, onRent } = this.props;
+    const { titles = [], loaded, onRent } = this.props;
+    const movies = titles.filter(item => !item?.rented);
 
-    if (titles && loaded) {
-      return titles.map((item, i) => {
+    if (loaded) {
+      if (movies.length === 0) {
+        return (
+          <div className="TitleListEmpty">
+            {onRent ? 'No movies left to rent.' : 'No rented movies.'}
+          </div>
+        );
+      }
+
+      return movies.map((item, i) => {
         let name = '';
         const backDrop = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
         if (!item.name) {
@@ -227,12 +240,19 @@ class TitleList extends Component {
   }
 
   render() {
-    const { title } = this.props;
+    const { title, cost = 0 } = this.props;
 
     return (
       <div className="TitleList">
         <div className="Title">
-          <h1>{title}</h1>
+          <h1>
+            {title}
+            {cost ?
+              <span className="TitleList__cost">
+                (Total paid: <strong>{`\$${cost}`}</strong>)
+              </span> : null
+            }
+          </h1>
           <div className="titles-slider">
             {this.renderList() || <Loader />}
           </div>
@@ -256,12 +276,10 @@ class Item extends Component {
           </div>
           { onRent &&
             <div className="ItemToolbar">
-              {!item?.rented && (
-                <div className="button button-rent" onClick={() => onRent(item)}>
-                  Rent{item?.price ? ` for \$${item.price}` : ''}
-                </div>
-              )}
-            </div>
+              <div className="button button-rent" onClick={() => onRent(item)}>
+                Rent{item?.price ? ` for \$${item.price}` : ''}
+              </div>
+          </div>
           }
         </div>
       </div>
