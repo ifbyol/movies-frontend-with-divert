@@ -1,1 +1,3 @@
-# movies-frontend-with-divert
+# movies-frontend
+
+Movies frontend using multi repo

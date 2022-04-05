@@ -1,0 +1,17 @@
+icon: https://apps.okteto.com/movies/icon.png
+build:
+  frontend:
+    context: .
+  dev:
+    context: .
+    target: dev
+
+deploy:
+  - helm upgrade --install movies-frontend chart --set tag=${OKTETO_BUILD_FRONTEND_IMAGE}
+
+dev:
+  frontend:
+    image: ${OKTETO_BUILD_DEV_IMAGE}
+    command: yarn start
+    sync:
+      - .:/src
