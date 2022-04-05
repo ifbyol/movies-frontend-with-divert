@@ -288,12 +288,6 @@ body {
   text-overflow: ellipsis;
 }
 
-.App .Item .ItemContainer .overlay .ListToggle {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-}
-
 .App .Item:hover .overlay {
   opacity: 1;
   pointer-events: all;
@@ -327,46 +321,6 @@ body {
 .App .Item .button:hover {
   background-color: #f02323;
   transform: scale(1.05);
-}
-
-.App .ListToggle {
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
-  border-radius: 32px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.App .ListToggle:hover {
-  border: 2px solid #ffffff;
-}
-
-.App .ListToggle:hover div {
-  top: -32px;
-}
-
-.App .ListToggle > div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 64px;
-  width: 32px;
-  transition: .125s ease;
-}
-
-.App .ListToggle div svg path {
-  fill: #ffffff;
-}
-
-.App .ListToggle[data-toggled="true"] {
-  background: #00d1ca;
-  border: 2px solid #00d1ca;
-}
-
-.App .ListToggle[data-toggled="true"] div {
-  top: -32px;
 }
 
 .App .Loader {

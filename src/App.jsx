@@ -5,9 +5,20 @@ import movieBackground from './assets/images/movie-bg.jpg';
 
 import './App.css';
 
-import catalog from 'fixtures/catalog.json';
-import rental from 'fixtures/rental.json';
-console.log(catalog, rental);
+const handleRent = async (item) => {
+  console.log(item);
+  const response = await fetch('/rent', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      catalog_id: item.id,
+      price: item.price
+    })
+  });
+  return response.json();
+}
 
 class App extends Component {
   constructor(props) {
@@ -35,29 +46,27 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // fetch('/catalog')
-    //   .then(res => res.json())
-    //   .then(result => {
-    //     this.setState({
-    //       catalog: {
-    //         data: result,
-    //         loaded: true
-    //       }
-    //     });
-    //   });
-    this.setState({ catalog: { data: catalog.results, loaded: true } });
+    fetch('/catalog')
+      .then(res => res.json())
+      .then(result => {
+        this.setState({
+          catalog: {
+            data: result,
+            loaded: true
+          }
+        });
+      });
 
-    // fetch('/rental')
-    //   .then(res => res.json())
-    //   .then(result => {
-    //     this.setState({
-    //       watching: {
-    //         data: result,
-    //         loaded: true
-    //       }
-    //     });
-    //   });
-    this.setState({ rental: { data: rental.results, loaded: true } });
+    fetch('/rentals')
+      .then(res => res.json())
+      .then(result => {
+        this.setState({
+          rental: {
+            data: result,
+            loaded: true
+          }
+        });
+      });
 
     window.addEventListener('scroll', this.onScroll);
   }
@@ -82,7 +91,7 @@ class App extends Component {
             <ul className="menu">
               <li className="selected">Home</li>
               <li>Movies</li>
-              <li>My List</li>
+              <li>Store</li>
             </ul>
             <UserProfile user={session} />
           </div>
@@ -92,6 +101,7 @@ class App extends Component {
           title="Movies to Rent"
           titles={catalog.data}
           loaded={catalog.loaded}
+          rent
         />
         <TitleList
           title={`${session.name}'s movies`}
@@ -164,12 +174,6 @@ class Hero extends Component {
               </svg>
               Play
             </HeroButton>
-            <HeroButton class="list-button">
-              <svg className="icon add-icon" width="20" height="20" viewBox="0 0 20 20">
-                <path d="M16 9h-5V4H9v5H4v2h5v5h2v-5h5V9z"/>
-              </svg>
-              My list
-            </HeroButton>
           </div>
         </div>
         <div className="overlay"></div>
@@ -189,39 +193,44 @@ class HeroButton extends Component {
 
 
 class TitleList extends Component {
-  render() {
-    let titles = '';
-    if (this.props.titles && this.props.loaded) {
-      titles = this.props.titles.map((title, i) => {
+  renderList() {
+    const { titles, loaded, rent } = this.props;
+
+    if (titles && loaded) {
+      return titles.map((item, i) => {
         if (i < 4) {
           let name = '';
-          const backDrop = `https://image.tmdb.org/t/p/original${title.backdrop_path}`;
-          if (!title.name) {
-            name = title.original_title;
+          const backDrop = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
+          if (!item.name) {
+            name = item.original_title;
           } else {
-            name = title.name;
+            name = item.name;
           }
           return (
             <Item
-              key={title.id}
-              title={name}
-              score={title.vote_average}
-              overview={title.overview}
+              key={item.id}
+              item={item}
               backdrop={backDrop}
+              rent={rent}
             />
           );
         }
         return (
-          <div key={title.id}></div>
+          <div key={item.id}></div>
         );
       });
     }
+  }
+
+  render() {
+    const { title } = this.props;
+
     return (
       <div className="TitleList">
         <div className="Title">
-          <h1>{this.props.title}</h1>
+          <h1>{title}</h1>
           <div className="titles-slider">
-            {titles || <Loader />}
+            {this.renderList() || <Loader />}
           </div>
         </div>
       </div>
@@ -232,54 +241,22 @@ class TitleList extends Component {
 
 class Item extends Component {
   render() {
+    const { item, rent, backdrop } = this.props;
+
     return (
       <div className="Item">
-        <div className="ItemContainer" style={{ backgroundImage: `url(${this.props.backdrop})` }}>
+        <div className="ItemContainer" style={{ backgroundImage: `url(${backdrop})` }}>
           <div className="overlay">
-            <div className="title">{this.props.title}</div>
-            <div className="rating">{this.props.score} / 10</div>
-            <ListToggle />
+            <div className="title">{item?.original_title ?? 'Unknown Title'}</div>
+            <div className="rating">{item?.vote_average ?? 0} / 10</div>
           </div>
-          <div className="ItemToolbar">
-            <div className="button">Rent for $XX</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-
-class ListToggle extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { toggled: false };
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick() {
-    if(this.state.toggled === true) {
-      this.setState({ toggled: false });
-    } else {
-      this.setState({ toggled: true });
-    }
-  }
-
-  render() {
-    return (
-      <div className="ListToggle" onClick={this.handleClick} data-toggled={this.state.toggled}>
-        <div>
-          <div style={{ width: '32px', height: '32px'}}>
-            <svg className="plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path d="M24,13.2c-0.6,0-1,0.4-1,1v9h-9c-0.6,0-1,0.4-1,1s0.4,1,1,1h9v9c0,0.6,0.4,1,1,1s1-0.4,1-1v-9h9c0.6,0,1-0.4,1-1    s-0.4-1-1-1h-9v-9C25,13.6,24.6,13.2,24,13.2z"/>
-            </svg>
-          </div>
-          <div style={{ width: '32px', height: '32px'}}>
-            <svg className="check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path d="M33.2,16.9L21,29l-6.5-6.4c-0.4-0.4-1-0.4-1.4,0c-0.4,0.4-0.4,1,0,1.4l7.2,7.1c0.2,0.2,0.5,0.3,0.7,0.3    c0.3,0,0.5-0.1,0.7-0.3l12.8-12.8c0.4-0.4,0.4-1,0-1.4C34.2,16.5,33.6,16.5,33.2,16.9z"/>
-            </svg>
-          </div>
+          { rent &&
+            <div className="ItemToolbar">
+              <div className="button" onClick={() => handleRent(item)}>
+                Rent{item?.price ? ` for \$${item.price}` : ''}
+              </div>
+            </div>
+          }
         </div>
       </div>
     );
