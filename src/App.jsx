@@ -256,13 +256,9 @@ class Item extends Component {
           </div>
           { onRent &&
             <div className="ItemToolbar">
-              {!item?.rented ? (
+              {!item?.rented && (
                 <div className="button button-rent" onClick={() => onRent(item)}>
                   Rent{item?.price ? ` for \$${item.price}` : ''}
-                </div>
-              ) : (
-                <div className="button button-rented" onClick={() => onRent(item)}>
-                  Watch Now
                 </div>
               )}
             </div>
