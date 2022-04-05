@@ -31,7 +31,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('/api/catalog')
+    fetch('/catalog')
       .then(res => res.json())
       .then(result => {
         this.setState({
@@ -42,23 +42,23 @@ class App extends Component {
         });
       });
 
-    fetch('/api/rentals')
+    fetch('/api/movies')
       .then(res => res.json())
       .then(result => {
         this.setState({
-          watching: {
+          movies: {
             data: result,
             loaded: true
           }
         });
       });
 
-      fetch('/api/rent')
+    fetch('/api/watching')
       .then(res => res.json())
       .then(result => {
         this.setState({
           watching: {
-            data: result,
+            data: [], //result,
             loaded: true
           }
         });
@@ -83,7 +83,7 @@ class App extends Component {
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
           <div className="content">
-            <div className="logo">Netflix</div>
+            <div className="logo">Movies</div>
             <ul className="menu">
               <li className="selected">Home</li>
               <li>Movies</li>
@@ -93,9 +93,13 @@ class App extends Component {
           </div>
         </header>
         <Hero />
-        <TitleList title="Movies" titles={movies.data} loaded={movies.loaded} />
         <TitleList
-          title={`Continue watching for ${session.name}`}
+          title="Movies to Rent"
+          titles={movies.data}
+          loaded={movies.loaded}
+        />
+        <TitleList
+          title={`${session.name}'s movies`}
           titles={watching.data}
           loaded={watching.loaded}
         />
@@ -240,6 +244,9 @@ class Item extends Component {
             <div className="title">{this.props.title}</div>
             <div className="rating">{this.props.score} / 10</div>
             <ListToggle />
+          </div>
+          <div className="ItemToolbar">
+            <div className="button">Rent for $XX</div>
           </div>
         </div>
       </div>

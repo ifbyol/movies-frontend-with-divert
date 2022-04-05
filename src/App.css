@@ -256,6 +256,7 @@ body {
   overflow: hidden;
   margin: 0 2px;
   position: relative;
+  display: flex;
 }
 
 .App .Item .ItemContainer .overlay {
@@ -296,6 +297,36 @@ body {
 .App .Item:hover .overlay {
   opacity: 1;
   pointer-events: all;
+  width: 100%;
+}
+
+.App .Item .ItemToolbar {
+  display: block;
+  flex-direction: row;
+  align-items: flex-end;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+}
+
+.App .Item .button {
+  display: inline-block;
+  color: #fff;
+  background-color: #ce1616;
+  border-radius: 4px;
+  box-shadow: -1px 4px 20px 3px #000000;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px;
+  margin: 8px;
+  text-align: center;
+  transition: transform .2s ease-in-out;
+}
+
+.App .Item .button:hover {
+  background-color: #f02323;
+  transform: scale(1.05);
 }
 
 .App .ListToggle {
