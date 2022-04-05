@@ -5,17 +5,21 @@ import movieBackground from './assets/images/movie-bg.jpg';
 
 import './App.css';
 
+import catalog from 'fixtures/catalog.json';
+import rental from 'fixtures/rental.json';
+console.log(catalog, rental);
+
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      movies: {
-        data: {},
+      catalog: {
+        data: [],
         loaded: false
       },
-      watching: {
-        data: {},
+      rental: {
+        data: [],
         loaded: false
       },
       session: {
@@ -31,38 +35,29 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('/catalog')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          movies: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
+    // fetch('/catalog')
+    //   .then(res => res.json())
+    //   .then(result => {
+    //     this.setState({
+    //       catalog: {
+    //         data: result,
+    //         loaded: true
+    //       }
+    //     });
+    //   });
+    this.setState({ catalog: { data: catalog.results, loaded: true } });
 
-    fetch('/api/movies')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          movies: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
-    fetch('/api/watching')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          watching: {
-            data: [], //result,
-            loaded: true
-          }
-        });
-      });
+    // fetch('/rental')
+    //   .then(res => res.json())
+    //   .then(result => {
+    //     this.setState({
+    //       watching: {
+    //         data: result,
+    //         loaded: true
+    //       }
+    //     });
+    //   });
+    this.setState({ rental: { data: rental.results, loaded: true } });
 
     window.addEventListener('scroll', this.onScroll);
   }
@@ -78,7 +73,7 @@ class App extends Component {
   }
 
   render() {
-    const { movies, watching, session } = this.state;
+    const { catalog, rental, session } = this.state;
     return (
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
@@ -95,13 +90,13 @@ class App extends Component {
         <Hero />
         <TitleList
           title="Movies to Rent"
-          titles={movies.data}
-          loaded={movies.loaded}
+          titles={catalog.data}
+          loaded={catalog.loaded}
         />
         <TitleList
           title={`${session.name}'s movies`}
-          titles={watching.data}
-          loaded={watching.loaded}
+          titles={rental.data}
+          loaded={rental.loaded}
         />
       </div>
     );
