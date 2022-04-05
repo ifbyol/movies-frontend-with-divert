@@ -246,7 +246,7 @@ class TitleList extends Component {
 class Item extends Component {
   render() {
     const { item, onRent, backdrop } = this.props;
-console.log(item);
+
     return (
       <div className="Item">
         <div className="ItemContainer" style={{ backgroundImage: `url(${backdrop})` }}>

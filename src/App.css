@@ -254,7 +254,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;
-  margin: 0 2px;
+  margin: 2px;
   position: relative;
   display: flex;
 }
