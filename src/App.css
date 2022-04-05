@@ -308,7 +308,7 @@ body {
   display: inline-block;
   color: #fff;
   background-color: #ce1616;
-  border-radius: 4px;
+  border-radius: 3px;
   box-shadow: -1px 4px 20px 3px #000000;
   font-size: 14px;
   font-weight: bold;
@@ -321,6 +321,10 @@ body {
 .App .Item .button:hover {
   background-color: #f02323;
   transform: scale(1.05);
+}
+
+.App .Item .button.button-rented{
+  background-color: #000;
 }
 
 .App .Loader {

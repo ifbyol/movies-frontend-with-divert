@@ -5,19 +5,10 @@ import movieBackground from './assets/images/movie-bg.jpg';
 
 import './App.css';
 
-const handleRent = async (item) => {
-  console.log(item);
-  const response = await fetch('/rent', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      catalog_id: item.id,
-      price: item.price
-    })
-  });
-  return response.json();
+const compact = (movies = []) => {
+  return movies.filter((item, index, self) =>
+    self.findIndex(i => i.id === item.id) === index
+  );
 }
 
 class App extends Component {
@@ -46,28 +37,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('/catalog')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          catalog: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
-    fetch('/rentals')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          rental: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
+    this.refreshData();
     window.addEventListener('scroll', this.onScroll);
   }
 
@@ -75,7 +45,46 @@ class App extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  onScroll() {
+  handleRent = async (item) => {
+    await fetch('/rent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        catalog_id: item.id,
+        price: item.price
+      })
+    });
+    this.refreshData();
+  }
+
+  refreshData = async () => {
+    const catalogPromise = fetch('/catalog')
+      .then(res => res.json())
+      .then(result => compact(result));
+
+    const rentalsPromise = fetch('/rentals')
+      .then(res => res.json())
+      .then(result => compact(result));
+
+    const [catalog, rentals] = await Promise.all([catalogPromise, rentalsPromise]);
+    this.setState({
+      rental: {
+        data: rentals,
+        loaded: true
+      },
+      catalog: {
+        data: catalog.map(movie => ({
+          ...movie,
+          rented: !!rentals.find(c => c.id === movie.id)
+        })),
+        loaded: true
+      }
+    });
+  }
+
+  onScroll = () => {
     this.setState({
       fixHeader: window.scrollY > 100
     });
@@ -90,18 +99,18 @@ class App extends Component {
             <div className="logo">Movies</div>
             <ul className="menu">
               <li className="selected">Home</li>
-              <li>Movies</li>
               <li>Store</li>
+              <li>Movies</li>
             </ul>
             <UserProfile user={session} />
           </div>
         </header>
         <Hero />
         <TitleList
-          title="Movies to Rent"
+          title="Store"
           titles={catalog.data}
           loaded={catalog.loaded}
-          rent
+          onRent={this.handleRent}
         />
         <TitleList
           title={`${session.name}'s movies`}
@@ -194,29 +203,24 @@ class HeroButton extends Component {
 
 class TitleList extends Component {
   renderList() {
-    const { titles, loaded, rent } = this.props;
+    const { titles, loaded, onRent } = this.props;
 
     if (titles && loaded) {
       return titles.map((item, i) => {
-        if (i < 4) {
-          let name = '';
-          const backDrop = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
-          if (!item.name) {
-            name = item.original_title;
-          } else {
-            name = item.name;
-          }
-          return (
-            <Item
-              key={item.id}
-              item={item}
-              backdrop={backDrop}
-              rent={rent}
-            />
-          );
+        let name = '';
+        const backDrop = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
+        if (!item.name) {
+          name = item.original_title;
+        } else {
+          name = item.name;
         }
         return (
-          <div key={item.id}></div>
+          <Item
+            key={item.id}
+            item={item}
+            backdrop={backDrop}
+            onRent={onRent}
+          />
         );
       });
     }
@@ -241,8 +245,8 @@ class TitleList extends Component {
 
 class Item extends Component {
   render() {
-    const { item, rent, backdrop } = this.props;
-
+    const { item, onRent, backdrop } = this.props;
+console.log(item);
     return (
       <div className="Item">
         <div className="ItemContainer" style={{ backgroundImage: `url(${backdrop})` }}>
@@ -250,11 +254,17 @@ class Item extends Component {
             <div className="title">{item?.original_title ?? 'Unknown Title'}</div>
             <div className="rating">{item?.vote_average ?? 0} / 10</div>
           </div>
-          { rent &&
+          { onRent &&
             <div className="ItemToolbar">
-              <div className="button" onClick={() => handleRent(item)}>
-                Rent{item?.price ? ` for \$${item.price}` : ''}
-              </div>
+              {!item?.rented ? (
+                <div className="button button-rent" onClick={() => onRent(item)}>
+                  Rent{item?.price ? ` for \$${item.price}` : ''}
+                </div>
+              ) : (
+                <div className="button button-rented" onClick={() => onRent(item)}>
+                  Watch Now
+                </div>
+              )}
             </div>
           }
         </div>
