@@ -4,10 +4,11 @@ metadata:
   name: frontend
   labels:
     {{- include "movies.labels" . | nindent 4 }}
+  annotations:
+    dev.okteto.com/generate-host: "movies"
 spec:
   rules:
-    - host: movies-{{ .Release.Namespace }}.demo.okteto.dev
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
@@ -16,6 +17,3 @@ spec:
                 name: frontend
                 port:
                   number: 80
-  tls:
-  - hosts:
-    - movies-{{ .Release.Namespace }}.demo.okteto.dev
