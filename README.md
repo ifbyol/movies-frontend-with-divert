@@ -1,3 +1,7 @@
-# movies-frontend
+# Movies App
 
-Movies frontend using multi repo
+![Architecture diagram](images/app.png)
+
+![Partial dev environment](images/partial.png)
+
+![Divert](images/divert.png)
