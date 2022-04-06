@@ -1,4 +1,5 @@
 icon: https://apps.okteto.com/movies/icon.png
+
 build:
   frontend:
     context: .
