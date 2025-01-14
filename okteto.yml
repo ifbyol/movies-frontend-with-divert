@@ -10,7 +10,7 @@ build:
 deploy:
   compose: okteto-compose.yml
   divert:
-    namespace: staging
+    namespace: ifbyol-staging
 
 dev:
   frontend:
