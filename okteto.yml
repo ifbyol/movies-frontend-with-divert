@@ -8,7 +8,9 @@ build:
     target: dev
 
 deploy:
-  - helm upgrade --install movies-frontend chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
+  compose: okteto-compose.yml
+  divert:
+    namespace: staging
 
 dev:
   frontend:

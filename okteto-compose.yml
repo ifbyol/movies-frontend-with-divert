@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: ${OKTETO_BUILD_FRONTEND_IMAGE}
+
+endpoints:
+  movies:
+    - path: /
+      service: frontend
+      port: 80
